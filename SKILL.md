@@ -1,6 +1,6 @@
 ---
 name: setup-mcps
-description: Instala y verifica todos los MCP servers y skills usados en wagent-ai — 12 MCPs (7 CLI + 2 URL + 3 globales) + 19 skills (2 packs + 17 individuales) + RTK CLI
+description: Instala y verifica todos los MCP servers y skills usados en wagent-ai — 8 MCPs (6 CLI + 2 URL) + MS 365 + 18 skills (2 packs + 16 individuales) + RTK CLI
 argument-hint: "--check | --install | --reinstall"
 ---
 
@@ -17,10 +17,9 @@ Instala y verifica los MCP servers y skills requeridos para desarrollo en wagent
 | `context7` | user | Docs de librerías en tiempo real | `npx -y @upstash/context7-mcp@latest` |
 | `filesystem` | user | Acceso al filesystem local | `cmd /c npx -y @modelcontextprotocol/server-filesystem D:/Usuarios/mpuyo/Escritorio` |
 | `github` | user | PRs, issues, code search en GitHub | `cmd /c npx -y @modelcontextprotocol/server-github` + `GITHUB_PERSONAL_ACCESS_TOKEN` |
-| `mermaid` | user | Generación de diagramas Mermaid | `npx -y @peng-shawn/mermaid-mcp-server` |
+| `mermaid` | user | Diagramas estructurados desde código | `npx -y @peng-shawn/mermaid-mcp-server` |
 | `playwright` | user | Testing E2E y web scraping/documentación | `cmd /c npx -y @playwright/mcp` |
-| `excalidraw` | user | Diagramas colaborativos | `cmd /c npx -y excalidraw-mcp` |
-| `sqlserver` | user | Queries SQL Server directas | `npx -y @galileicloud/mcp-sqlserver` + env vars DB |
+| `excalidraw` | user | Diagramas freeform y whiteboard colaborativo | `cmd /c npx -y excalidraw-mcp` |
 
 ### MCPs URL (HTTP remoto)
 
@@ -34,10 +33,8 @@ Instala y verifica los MCP servers y skills requeridos para desarrollo en wagent
 | MCP | Propósito | Cómo activar |
 |-----|-----------|--------------|
 | `Microsoft 365` | Email, calendario, SharePoint | claude.ai > Settings > Integrations > Microsoft 365 |
-| `Atlassian` | Jira, Confluence | claude.ai > Settings > Integrations > Atlassian |
-| `pencil` | Diseño de pantallas UI/UX | VS Code Extension: Pencil Dev |
 
-> Los MCPs globales se configuran desde claude.ai o extensiones de VS Code, no via CLI.
+> Los MCPs globales se configuran desde claude.ai, no via CLI.
 
 ## Skills requeridas por este proyecto
 
@@ -61,7 +58,6 @@ Instala y verifica los MCP servers y skills requeridos para desarrollo en wagent
 | `code-review-security` | `hieutrtr/ai1-skills` | Security review: SQLi, XSS, CSRF, secrets detection |
 | `docker-expert` | `sickn33/antigravity-awesome-skills` | Multi-stage builds, security hardening, orchestration |
 | `redis-development` | `redis/agent-skills` | Redis data structures, vector search, semantic caching |
-| `supabase-postgres-best-practices` | `supabase/agent-skills` | PostgreSQL optimization, schema design, queries |
 | `vitest` | `antfu/skills` | Unit testing con Vite, mocking, coverage, fixtures |
 | `logging-best-practices` | `boristane/agent-skills` | Wide events, canonical log lines, debugging |
 | `zod-schema-validation` | `mindrally/skills` | Zod schemas, runtime validation, type inference |
@@ -140,28 +136,6 @@ claude mcp add playwright -s user -- cmd /c "npx -y @playwright/mcp"
 claude mcp add excalidraw -s user -- cmd /c "npx -y excalidraw-mcp"
 ```
 
-#### sqlserver
-Requiere variables de entorno de conexión a la base de datos.
-
-```bash
-claude mcp add sqlserver -s user \
-  -e DB_SERVER="${DB_SERVER}" \
-  -e DB_PORT="${DB_PORT:-1433}" \
-  -e DB_DATABASE="${DB_DATABASE}" \
-  -e DB_USER="${DB_USER}" \
-  -e DB_PASSWORD="${DB_PASSWORD}" \
-  -e DB_ENCRYPT="${DB_ENCRYPT:-false}" \
-  -e DB_TRUST_SERVER_CERT="${DB_TRUST_SERVER_CERT:-true}" \
-  -- npx -y @galileicloud/mcp-sqlserver
-```
-
-Si las variables no están definidas, avisa al usuario:
-```
-⚠️  Variables de conexión SQL Server no encontradas.
-    Configura: DB_SERVER, DB_DATABASE, DB_USER, DB_PASSWORD
-    Luego vuelve a correr /setup-mcps --install
-```
-
 ### Paso 3 — Instalar MCPs URL faltantes (solo si `--install` o `--reinstall`)
 
 #### granola
@@ -178,16 +152,12 @@ claude mcp add linear-server -s user --url "https://mcp.linear.app/mcp"
 
 > Requiere autenticación OAuth en el browser la primera vez.
 
-### Paso 4 — MCPs Globales (acción manual)
-
-Estos no se pueden instalar via CLI. Informa al usuario:
+### Paso 4 — MCP Global (acción manual)
 
 ```
-ℹ️  MCPs globales — requieren configuración manual:
+ℹ️  MCP global — requiere configuración manual:
 
   Microsoft 365  → claude.ai > Settings > Integrations > Microsoft 365
-  Atlassian      → claude.ai > Settings > Integrations > Atlassian
-  pencil         → Instalar extensión VS Code: Pencil Dev (highagency.pencildev)
 ```
 
 ### Paso 5 — Instalar Skills faltantes (solo si `--install` o `--reinstall`)
@@ -219,7 +189,6 @@ claude skills add shadcn/ui                               # shadcn
 claude skills add davila7/claude-code-templates           # nodejs-best-practices
 claude skills add boristane/agent-skills                  # logging-best-practices
 claude skills add redis/agent-skills                      # redis-development
-claude skills add supabase/agent-skills                   # supabase-postgres-best-practices
 
 # Validation & Testing
 claude skills add mindrally/skills                        # zod-schema-validation
@@ -244,34 +213,31 @@ Después de instalar, ejecuta `claude mcp list` de nuevo y verifica que todos lo
 Presenta tabla final con el estado post-instalación:
 
 ```
-✅ MCPs CLI instalados:
+✅ MCPs CLI instalados (6):
   - context7          (@upstash/context7-mcp)
   - filesystem         (@modelcontextprotocol/server-filesystem)
   - github             (@modelcontextprotocol/server-github)
   - mermaid            (@peng-shawn/mermaid-mcp-server)
   - playwright         (@playwright/mcp)
   - excalidraw         (excalidraw-mcp)
-  - sqlserver           (@galileicloud/mcp-sqlserver)
 
-✅ MCPs URL instalados:
+✅ MCPs URL instalados (2):
   - granola            (https://mcp.granola.ai/mcp)
   - linear-server      (https://mcp.linear.app/mcp)
 
-✅ Skill Packs instalados:
+✅ Skill Packs instalados (2):
   - superpowers        (13 skills)
   - ui-ux-pro-max      (design system generator)
 
-✅ Skills individuales instaladas (17):
+✅ Skills individuales instaladas (16):
   - typescript-best-practices, vercel-react-best-practices, next-best-practices
   - nodejs-best-practices, logging-best-practices, redis-development
-  - supabase-postgres-best-practices, zod-schema-validation, vitest, pnpm
+  - zod-schema-validation, vitest, pnpm
   - api-security-best-practices, code-review-excellence, code-review-security
   - docker-expert, devops-engineer, shadcn, mcp-builder
 
-⚠️ Requieren acción manual:
+⚠️ Requiere acción manual:
   - Microsoft 365  → claude.ai Integrations
-  - Atlassian      → claude.ai Integrations
-  - pencil         → VS Code Extension: Pencil Dev
 
 Reinicia Claude Code para que los MCPs y skills nuevos estén disponibles.
 ```
@@ -313,7 +279,7 @@ rtk init --global
 - En Windows, los MCPs que usan npx requieren `cmd /c "npx -y ..."` para evitar problemas de PATH.
 - Si `claude mcp add` falla con "already exists", usa `claude mcp remove <name> -s user` primero.
 - MCPs con `-s user` aplican a todos los proyectos. Sin scope aplican solo al proyecto actual.
-- GitHub y SQL Server necesitan env vars — nunca hardcodearlas, siempre leer de variables de entorno.
+- GitHub necesita `GITHUB_PERSONAL_ACCESS_TOKEN` — nunca hardcodearla, siempre leer de env var.
 - MCPs URL (granola, linear-server) se conectan via HTTP y pueden requerir auth OAuth en browser.
-- MCPs globales (MS 365, Atlassian, pencil) no se instalan via CLI — son integraciones de plataforma.
 - Skills se instalan con `claude skills add <repo>` y quedan en `.claude/skills/`.
+- `supabase-postgres-best-practices` y `sqlserver` se configuran con scope local por proyecto — no incluidos en esta skill.
