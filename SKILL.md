@@ -1,6 +1,6 @@
 ---
 name: setup-mcps
-description: Instala y verifica todos los MCP servers y skills usados en wagent-ai (context7, filesystem, github, granola, linear, mermaid, pencil, playwright, sqlserver, MS 365, Atlassian + skills superpowers y ui-ux-pro-max)
+description: Instala y verifica todos los MCP servers y skills usados en wagent-ai — 12 MCPs (7 CLI + 2 URL + 3 globales) + 19 skills (2 packs + 17 individuales) + RTK CLI
 argument-hint: "--check | --install | --reinstall"
 ---
 
@@ -41,10 +41,34 @@ Instala y verifica los MCP servers y skills requeridos para desarrollo en wagent
 
 ## Skills requeridas por este proyecto
 
+### Skill Packs (repos multi-skill)
+
 | Skill Pack | Repo | Propósito |
 |------------|------|-----------|
 | `superpowers` | `obra/superpowers` | TDD, debugging sistemático, plan execution, worktrees, code review, subagentes |
 | `ui-ux-pro-max` | `nextlevelbuilder/ui-ux-pro-max-skill` | Design system generator, 67 estilos UI, 161 industry rules (incluye Hotel), shadcn/ui + Tailwind |
+
+### Skills individuales
+
+| Skill | Repo | Propósito |
+|-------|------|-----------|
+| `typescript-best-practices` | `0xbigboss/claude-code` | Type-first development, discriminated unions, exhaustive handling |
+| `vercel-react-best-practices` | `vercel-labs/agent-skills` | React/Next.js performance patterns de Vercel Engineering |
+| `next-best-practices` | `vercel-labs/next-skills` | File conventions, RSC, data patterns, metadata, error handling |
+| `nodejs-best-practices` | `davila7/claude-code-templates` | Async patterns, seguridad, arquitectura Node.js |
+| `api-security-best-practices` | `sickn33/antigravity-awesome-skills` | Auth, input validation, rate limiting, OWASP |
+| `code-review-excellence` | `wshobson/agents` | Code review constructivo, catch bugs, knowledge sharing |
+| `code-review-security` | `hieutrtr/ai1-skills` | Security review: SQLi, XSS, CSRF, secrets detection |
+| `docker-expert` | `sickn33/antigravity-awesome-skills` | Multi-stage builds, security hardening, orchestration |
+| `redis-development` | `redis/agent-skills` | Redis data structures, vector search, semantic caching |
+| `supabase-postgres-best-practices` | `supabase/agent-skills` | PostgreSQL optimization, schema design, queries |
+| `vitest` | `antfu/skills` | Unit testing con Vite, mocking, coverage, fixtures |
+| `logging-best-practices` | `boristane/agent-skills` | Wide events, canonical log lines, debugging |
+| `zod-schema-validation` | `mindrally/skills` | Zod schemas, runtime validation, type inference |
+| `shadcn` | `shadcn/ui` | Componentes UI, registries, presets, styling |
+| `devops-engineer` | `jeffallan/claude-skills` | CI/CD, Kubernetes, Terraform, GitHub Actions |
+| `pnpm` | `antfu/skills` | Workspaces, catalogs, patches, strict resolution |
+| `mcp-builder` | `anthropics/skills` | Crear MCP servers con FastMCP o MCP SDK |
 
 ## Argumentos
 
@@ -61,6 +85,7 @@ Ejecuta `claude mcp list` y captura la salida. Identifica qué MCPs de las tabla
 Para skills, verifica si existen los directorios en `.claude/skills/`:
 - `.claude/skills/test-driven-development/` (de superpowers)
 - `.claude/skills/ui-ux-pro-max/` (de ui-ux-pro-max-skill)
+- `.claude/skills/typescript-best-practices/` (skill individual)
 
 Presenta un resumen en tabla:
 
@@ -70,6 +95,7 @@ Presenta un resumen en tabla:
 | granola | MCP URL | ✅ / ❌ | ... |
 | Microsoft 365 | MCP Global | ✅ / ❌ | ... |
 | superpowers | Skill Pack | ✅ / ❌ | ... |
+| typescript-best-practices | Skill | ✅ / ❌ | ... |
 | ... | ... | ... | ... |
 
 ### Paso 2 — Instalar MCPs CLI faltantes (solo si `--install` o `--reinstall`)
@@ -166,23 +192,48 @@ Estos no se pueden instalar via CLI. Informa al usuario:
 
 ### Paso 5 — Instalar Skills faltantes (solo si `--install` o `--reinstall`)
 
-#### superpowers (obra/superpowers)
-
-Incluye 13 skills: TDD, systematic-debugging, writing-plans, executing-plans, finishing-a-development-branch, verification-before-completion, brainstorming, requesting-code-review, receiving-code-review, using-git-worktrees, subagent-driven-development, writing-skills, using-superpowers.
+#### Skill Packs
 
 ```bash
+# superpowers — 13 skills: TDD, debugging, plans, worktrees, code review, subagentes
 claude skills add obra/superpowers
-```
 
-#### ui-ux-pro-max (nextlevelbuilder/ui-ux-pro-max-skill)
-
-Design system generator con 67 estilos UI, 161 industry rules, 161 paletas de color, 57 font pairings, 25 chart types. Soporta shadcn/ui, Next.js, React, Tailwind.
-
-```bash
+# ui-ux-pro-max — Design system generator, 67 estilos, 161 industry rules
 claude skills add nextlevelbuilder/ui-ux-pro-max-skill
 ```
 
-> Requiere Python 3 para el script de búsqueda de design systems.
+> ui-ux-pro-max requiere Python 3 para el script de búsqueda de design systems.
+
+#### Skills individuales
+
+Ejecuta cada una en secuencia. Si ya existe, `claude skills add` la salta automáticamente.
+
+```bash
+# TypeScript & Frontend
+claude skills add 0xbigboss/claude-code                  # typescript-best-practices
+claude skills add vercel-labs/agent-skills                # vercel-react-best-practices
+claude skills add vercel-labs/next-skills                 # next-best-practices
+claude skills add shadcn/ui                               # shadcn
+
+# Backend & Runtime
+claude skills add davila7/claude-code-templates           # nodejs-best-practices
+claude skills add boristane/agent-skills                  # logging-best-practices
+claude skills add redis/agent-skills                      # redis-development
+claude skills add supabase/agent-skills                   # supabase-postgres-best-practices
+
+# Validation & Testing
+claude skills add mindrally/skills                        # zod-schema-validation
+claude skills add antfu/skills                            # vitest + pnpm
+
+# Security & Code Review
+claude skills add sickn33/antigravity-awesome-skills      # api-security + docker-expert
+claude skills add wshobson/agents                         # code-review-excellence
+claude skills add hieutrtr/ai1-skills                     # code-review-security
+
+# DevOps & Infra
+claude skills add jeffallan/claude-skills                 # devops-engineer
+claude skills add anthropics/skills                       # mcp-builder
+```
 
 ### Paso 6 — Verificar instalación
 
@@ -206,9 +257,16 @@ Presenta tabla final con el estado post-instalación:
   - granola            (https://mcp.granola.ai/mcp)
   - linear-server      (https://mcp.linear.app/mcp)
 
-✅ Skills instaladas:
+✅ Skill Packs instalados:
   - superpowers        (13 skills)
   - ui-ux-pro-max      (design system generator)
+
+✅ Skills individuales instaladas (17):
+  - typescript-best-practices, vercel-react-best-practices, next-best-practices
+  - nodejs-best-practices, logging-best-practices, redis-development
+  - supabase-postgres-best-practices, zod-schema-validation, vitest, pnpm
+  - api-security-best-practices, code-review-excellence, code-review-security
+  - docker-expert, devops-engineer, shadcn, mcp-builder
 
 ⚠️ Requieren acción manual:
   - Microsoft 365  → claude.ai Integrations
