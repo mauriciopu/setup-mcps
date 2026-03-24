@@ -1,20 +1,19 @@
 ---
 name: setup-mcps
-description: Instala y verifica todos los MCP servers usados en wagent-ai (context7, excalidraw, filesystem, github, granola, linear, mermaid, pencil, playwright)
+description: Instala y verifica todos los MCP servers y skills usados en wagent-ai (context7, filesystem, github, granola, linear, mermaid, pencil, playwright + skills de superpowers y ui-ux-pro-max)
 argument-hint: "--check | --install | --reinstall"
 ---
 
-# Setup MCPs — wagent-ai
+# Setup MCPs & Skills — wagent-ai
 
-Instala y verifica los MCP servers requeridos para desarrollo en wagent-ai.
+Instala y verifica los MCP servers y skills requeridos para desarrollo en wagent-ai.
 
 ## MCPs requeridos por este proyecto
 
 | MCP | Scope | Propósito | Instalación |
 |-----|-------|-----------|-------------|
 | `context7` | user | Docs de librerías en tiempo real | `npx -y @context7/mcp-server` |
-| `excalidraw` | user | Diagramas de arquitectura | `npx -y @cmd8/excalidraw-mcp` |
-| `filesystem` | user | Acceso al filesystem local | `npx -y @modelcontextprotocol/server-filesystem D:/Usuarios/mpuyo/Escritorio` |
+| `filesystem` | user | Acceso al filesystem local | `npx -y @modelcontextprotocol/server-filesystem` |
 | `github` | user | PRs, issues, code search en GitHub | `npx -y @modelcontextprotocol/server-github` + `GITHUB_PERSONAL_ACCESS_TOKEN` |
 | `granola` | user | Transcripts de reuniones | URL: `https://mcp.granola.ai/mcp` |
 | `linear` | user | Gestión de tareas en Linear | `@emmett.deen/linear-mcp-server` + `LINEAR_API_TOKEN` |
@@ -22,10 +21,17 @@ Instala y verifica los MCP servers requeridos para desarrollo en wagent-ai.
 | `pencil` | user | Diseño de pantallas UI/UX | Configura via Claude Code Integrations |
 | `playwright` | user | Testing E2E y web scraping/documentación | `npx -y @playwright/mcp@latest` |
 
+## Skills requeridas por este proyecto
+
+| Skill Pack | Repo | Propósito |
+|------------|------|-----------|
+| `superpowers` | `obra/superpowers` | TDD, debugging sistemático, plan execution, worktrees, code review, subagentes |
+| `ui-ux-pro-max` | `nextlevelbuilder/ui-ux-pro-max-skill` | Design system generator, 67 estilos UI, 161 industry rules (incluye Hotel), shadcn/ui + Tailwind |
+
 ## Argumentos
 
-- `--check` (default): solo muestra el estado de cada MCP, sin instalar nada
-- `--install`: instala los MCPs que faltan
+- `--check` (default): solo muestra el estado de cada MCP y skill, sin instalar nada
+- `--install`: instala los MCPs y skills que faltan
 - `--reinstall`: reinstala todos aunque ya estén instalados
 
 ## Ejecución
@@ -34,12 +40,17 @@ Instala y verifica los MCP servers requeridos para desarrollo en wagent-ai.
 
 Ejecuta `claude mcp list` y captura la salida. Identifica qué MCPs de la tabla de arriba ya están instalados y cuáles faltan.
 
+Para skills, verifica si existen los directorios en `.claude/skills/`:
+- `.claude/skills/test-driven-development/` (de superpowers)
+- `.claude/skills/ui-ux-pro-max/` (de ui-ux-pro-max-skill)
+
 Presenta un resumen en tabla:
 
-| MCP | Estado | Notas |
-|-----|--------|-------|
-| context7 | ✅ instalado / ❌ falta / ⚠️ requiere config | ... |
-| ... | ... | ... |
+| Componente | Tipo | Estado | Notas |
+|------------|------|--------|-------|
+| context7 | MCP | ✅ / ❌ / ⚠️ | ... |
+| superpowers | Skill Pack | ✅ / ❌ | ... |
+| ... | ... | ... | ... |
 
 ### Paso 2 — Instalar MCPs faltantes (solo si `--install` o `--reinstall`)
 
@@ -49,13 +60,6 @@ Para cada MCP faltante, ejecuta el comando correspondiente en orden:
 ```bash
 claude mcp add context7 -s user -- npx -y @context7/mcp-server
 ```
-
-#### excalidraw
-```bash
-claude mcp add excalidraw -s user -- cmd /c "npx -y @cmd8/excalidraw-mcp"
-```
-
-> Nota Windows: usa `cmd /c "npx -y ..."` para evitar problemas de PATH en Windows.
 
 #### filesystem
 ```bash
@@ -117,29 +121,52 @@ Informa al usuario:
     No se puede instalar via CLI.
 ```
 
-### Paso 3 — Verificar instalación
+### Paso 3 — Instalar Skills faltantes (solo si `--install` o `--reinstall`)
 
-Después de instalar, ejecuta `claude mcp list` de nuevo y confirma que todos los MCPs ahora aparecen.
+#### superpowers (obra/superpowers)
 
-### Paso 4 — Resumen final
+Incluye 13 skills: TDD, systematic-debugging, writing-plans, executing-plans, finishing-a-development-branch, verification-before-completion, brainstorming, requesting-code-review, receiving-code-review, using-git-worktrees, subagent-driven-development, writing-skills, using-superpowers.
+
+```bash
+claude skills add obra/superpowers
+```
+
+#### ui-ux-pro-max (nextlevelbuilder/ui-ux-pro-max-skill)
+
+Design system generator con 67 estilos UI, 161 industry rules, 161 paletas de color, 57 font pairings, 25 chart types. Soporta shadcn/ui, Next.js, React, Tailwind.
+
+```bash
+claude skills add nextlevelbuilder/ui-ux-pro-max-skill
+```
+
+> Requiere Python 3 para el script de búsqueda de design systems.
+
+### Paso 4 — Verificar instalación
+
+Después de instalar, ejecuta `claude mcp list` de nuevo y verifica que los MCPs aparecen. Para skills, confirma que los directorios existen en `.claude/skills/`.
+
+### Paso 5 — Resumen final
 
 Presenta tabla final con el estado post-instalación:
 
 ```
 ✅ MCPs instalados correctamente:
   - context7
-  - excalidraw
   - filesystem
   - granola
   - linear
   - mermaid
   - playwright
 
+✅ Skills instaladas correctamente:
+  - superpowers (13 skills)
+  - ui-ux-pro-max (design system generator)
+
 ⚠️ Requieren acción manual:
   - github    → necesita GITHUB_PERSONAL_ACCESS_TOKEN
   - pencil    → instalar via Claude Code Integrations
 
-Reinicia Claude Code para que los MCPs nuevos estén disponibles.
+Reinicia Claude Code para que los MCPs y skills nuevos estén disponibles.
 ```
 
 ## Herramientas CLI adicionales
@@ -182,3 +209,4 @@ Verifica si RTK está instalado con `rtk --version`. Si no está, muestra las op
 - Si `claude mcp add` falla con "already exists", agrega `--force` o usa `claude mcp remove <name>` primero.
 - Los MCPs instalados con `-s user` aplican a todos los proyectos. Los instalados sin scope aplican solo al proyecto actual.
 - Linear y GitHub necesitan API keys — nunca hardcodearlas en el comando, siempre leer de env vars.
+- Skills se instalan con `claude skills add <repo>` y quedan en `.claude/skills/`.
